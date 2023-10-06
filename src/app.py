@@ -15,11 +15,16 @@ import json
 import components as c
 from typing import List
 
+import os
+jupyterhub_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX')
+dash_prefix = f"{jupyterhub_prefix}proxy/8050/" if jupyterhub_prefix else '/'
+
 '''
 This is the main Programming where the Server will be started and the navigator are constructed.
 '''
 
 app = dash.Dash(__name__, use_pages=True, prevent_initial_callbacks=False, suppress_callback_exceptions=True,
+                requests_pathname_prefix=dash_prefix,
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}],
                 )
@@ -75,11 +80,11 @@ def tree_update(upload):
             io_tree = jpt.JPT.from_json(json.loads(decoded))
         except Exception as e:
             print(e)
-            return False, "/"
+            return False, f"{dash_prefix}"
         c.in_use_tree = io_tree
         c.priors = io_tree.priors
-        return True, "/empty"
-    return False, "/"
+        return True, f"{dash_prefix}empty"
+    return False, f"{dash_prefix}"
 
 
 if __name__ == '__main__':
